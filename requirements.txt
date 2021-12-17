@@ -28,6 +28,7 @@ https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bc5cdr
 # A spaCy NER model trained on the BIONLP13CG corpus.
 # https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bionlp13cg_md-0.4.0.tar.gz
 
+chemdataextractor==1.3.0
 
 pydantic==1.8.2
 aioredis[hiredis]==2.0.0

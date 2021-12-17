@@ -4,6 +4,8 @@ COPY requirements.txt .
 
 RUN pip install -U -r requirements.txt
 
+RUN cde data download
+
 FROM python:3.8-slim-buster
 
 COPY --from=build /usr/local/bin /usr/local/bin
