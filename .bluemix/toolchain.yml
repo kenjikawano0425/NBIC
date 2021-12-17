@@ -17,7 +17,7 @@ template:
           "/tree/" + $env.branch + ")"
     hosted_region: "" # this is set automatically by DevOps
 toolchain:
-  name: $env.toolchainName || 'deepsearch-nlp-annotator-api-example-{{timestamp}}'
+  name: $env.toolchainName || 'nlpmodel-v-h-{{timestamp}}'
   template:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
@@ -36,7 +36,7 @@ services:
         } else if ($env.sourceZipUrl) {
           $env.sourceZipUrl
         } else if ($env.template.info.hosted_region === "") {
-          'https://github.com/IBM/deepsearch-nlp-annotator-api-example'
+          'https://github.com/dasaku-ai/nlpmodel-v-h'
         }
       source_repo_url: >
         if ($env.type === 'fork' || $env.type === 'clone') {
@@ -44,7 +44,7 @@ services:
         } else if ($env.sourceZipUrl) {
           $env.sourceZipUrl
         } else if ($env.template.info.hosted_region === "") {
-          'https://github.com/IBM/deepsearch-nlp-annotator-api-example'
+          'https://github.com/dasaku-ai/nlpmodel-v-h'
         }
       type: $env.type || 'clone'
       has_issues: true

@@ -470,7 +470,7 @@ The Deploy to IBM Cloud button is an efficient way to share your public Git-sour
 
 To get started, click **Deploy to IBM Cloud**.
 
-[![Deploy to IBM Cloud](https://cloud.ibm.com/devops/setup/deploy/button.png)](https://cloud.ibm.com/devops/setup/deploy?repository=https%3A//github.com/IBM/deepsearch-nlp-annotator-api-example)
+[![Deploy to IBM Cloud](https://cloud.ibm.com/devops/setup/deploy/button.png)](https://cloud.ibm.com/devops/setup/deploy?repository=https%3A//github.com/dasaku-ai/nlpmodel-v-h)
 
 ### Configuration
 
