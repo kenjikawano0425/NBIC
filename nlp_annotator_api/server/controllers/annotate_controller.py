@@ -15,7 +15,7 @@ from nlp_annotator_api.annotators.TextTableGeographyAnnotator import TextTableGe
 from nlp_annotator_api.annotators.SimpleTextClassifier import SimpleTextClassifier
 from nlp_annotator_api.annotators.ScispacyBiomedAnnotator import ScispacyBiomedAnnotator
 from nlp_annotator_api.annotators.WatsonHealthAnnotator import WatsonHealthAnnotator
-from nlp_annotator_api.annotators.ChemDataExtractor import ChemDataExtractor
+from nlp_annotator_api.annotators.MaterialValueUnitAnnotator import MaterialValueUnitAnnotator
 
 
 _log = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ annotators = {
     'SimpleTextClassifier': SimpleTextClassifier(),
     'ScispacyBiomedAnnotator': ScispacyBiomedAnnotator(),
     'WatsonHealthAnnotator': WatsonHealthAnnotator(),
-    'ChemDataExtractor': ChemDataExtractor()
+    'MaterialValueUnitAnnotator': MaterialValueUnitAnnotator()
 }
 
 

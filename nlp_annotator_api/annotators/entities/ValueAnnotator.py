@@ -4,20 +4,19 @@ import re
 from typing import Any, Optional
 from .common.utils import resources_dir
 
-from chemdataextractor import Document
 
-class MaterialAnnotator:
+class ValueAnnotator:
     
     def key(self) -> str:
-        return "materials"
+        return "value"
 
     def description(self) -> str:
-        return "finding materials with ChemDataExtractor+Regex"
+        return "finding value"
 
     def __init__(self):
 
         # init CDE
-        self.parser = RegChemAnnotator
+        self.parser = RegValueAnnotator
 
     def annotate_entities_text(self, text:str):
 
@@ -39,7 +38,7 @@ class MaterialAnnotator:
                 "match": name,
                 "range": [t0,t1],
                 "original": text[t0:t1],
-                "type":"material"
+                "type":"value"
             }
             ents.append(ent)
 
@@ -47,41 +46,20 @@ class MaterialAnnotator:
 
         return ents
     
-    def RegChemAnnotator(self, paragraph):
+    def RegValueAnnotator(self, paragraph):
         exlist = []
-
-        doc = Document(paragraph)
-        for text in doc.cems:
-            exlist.append([text.start, text.end, text.text, 1])
-
-
-        pattern = '((\$[_^]{[\d+-]{0,}}\$|[()\/\-\+])*((He|Li|Be|Ne|Na|Mg|Al|Si|Cl|Ar|Ca|Sc|Ti|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|H|B|C|N|O|F|P|S|K|V|I|W|U|Y|X)(\$[_^]{[\d+-]{0,}}\$|[()\/\-\+ ])*)+)'
+        ex_in_list = []
+        paragraph = list_para[num]
+        pattern = '([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?))'
         pattern_re = re.compile(pattern)
-        regex = pattern_re.finditer(paragraph)
+        parser = pattern_re
+        regex = parser.finditer(paragraph)
         for reg in regex:
-            if not len(paragraph) == reg.end():
-                if paragraph[reg.end()-2:reg.end()] == '/ ':
-                    exlist.append([reg.start(), reg.end()-2, reg.group()[0:-2], 1])
-                elif paragraph[reg.end()-1] == ' ' or paragraph[reg.end()-1] == '/':
-                    exlist.append([reg.start(), reg.end()-1, reg.group()[0:-1], 1])
-                elif not re.search("[a-z]", paragraph[reg.end()]):
-                    exlist.append([reg.start(), reg.end(), reg.group(), 1])
-            else:
-                exlist.append([reg.start(), reg.end(), reg.group(), 1])
-
-
-
-        pattern = '([A-Z]{3,})|(([\d\.]{1,}(K|MPa|kPa)|([\d\.]{1,} (K|MPa|kPa))))|([A-Z]*[CP]-[A-Z\d]*)|(\d{3,}C)|GC|As |([A-Z]+[\.-]+)'
-        pattern_re = re.compile(pattern)
-        regex = pattern_re.finditer(paragraph)
-
-        for reg in regex:
-            exlist.append([reg.start(), reg.end(), reg.group(), 0])
-
+            exlist.append([reg.start(), reg.end(), reg.group(), 1])
 
         exlist = list(map(list, set(map(tuple, exlist))))
         exlist = sorted(exlist)
-            
+
         def is_overlap(start1, end1, start2, end2):
             return start1 <= end2 and end1 >= start2
 
@@ -139,13 +117,22 @@ class MaterialAnnotator:
                             newlist.append(tmplist)
                         tmplist = []
             else:
-                if tmplist == [] and exlist[i][3] == 1:
-                    newlist.append(exlist[i])
-                elif exlist[i][3] == 0:
-                    break
-                elif tmplist[3] == 1:
-                    newlist.append(tmplist)
-        return newlist
+                newlist.append(exlist[i])
+
+
+        pattern_inverse = '((?<=\$[_^]{)\d+?(?=}\$))|((?<=\[)(\-*\d+)+?(?=\]))|((?<=figure)|((?<=Figure)|(?<=fig)|(?<=Fig)|(?<=figure\.)|(?<=Figure\.)|(?<=fig\.)|(?<=Fig\.)|(?<=table)|(?<=Table)|(?<=table\.)|(?<=Table\.))( \d+|\d+)(\.|))'
+        pattern_re = re.compile(pattern_inverse)
+        parser = pattern_re
+        regex = parser.finditer(paragraph)
+        for reg in regex:
+            newlist.append([reg.start(), reg.end(), reg.group(), 1])
+
+        finallist = []
+        for new in newlist:
+            if newlist.count(new) == 1:
+                finallist.append(new)
+        
+        return finallist
 #                "value" : 1,
 #                "unit" : "degree Celusius",
 #               "sentence" : " Li has conductivtiy 2e-4 mS at 1℃",

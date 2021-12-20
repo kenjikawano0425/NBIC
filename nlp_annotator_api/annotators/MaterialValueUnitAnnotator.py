@@ -12,16 +12,17 @@ from typing import List, Optional
 #import pprint ## For debugging only.
 
 from .entities.MaterialAnnotator import MaterialAnnotator
+from .entities.ValueAnnotator import ValueAnnotator
 
 
-
-class ChemDataExtractor:
+class MaterialValueUnitAnnotator:
     ## This is the class name that you need to use in the controller.
 
     supports = ('text', )
 
     _ent_annotator_classes = [
-        MaterialAnnotator
+        MaterialAnnotator,
+        ValueAnnotator
         ]
 
     _rel_annotator_classes = [
