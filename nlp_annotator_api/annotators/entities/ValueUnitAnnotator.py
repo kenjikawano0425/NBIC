@@ -8,10 +8,10 @@ from .common.utils import RegValueUnitAnnotator
 class ValueUnitAnnotator:
     
     def key(self) -> str:
-        return "value"
+        return "value+unit"
 
     def description(self) -> str:
-        return "finding value"
+        return "finding value+unit, where 3 options, float_value(500, 0.05), unit(mg, km) and range_bool(and, to, -)."
 
     def __init__(self):
 
@@ -38,7 +38,7 @@ class ValueUnitAnnotator:
                 "match": name,
                 "range": [t0,t1],
                 "original": text[t0:t1],
-                "type":"value + unit",
+                "type":"value+unit",
                 "unit":cem[4],
                 "range_bool":cem[5],
                 "float_value":cem[6]

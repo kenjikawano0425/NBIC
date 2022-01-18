@@ -12,7 +12,7 @@ from typing import List, Optional
 #import pprint ## For debugging only.
 
 from .entities.MaterialAnnotator import MaterialAnnotator
-from .entities.ValueAnnotator import ValueUnitAnnotator
+from .entities.ValueUnitAnnotator import ValueUnitAnnotator
 
 
 class MaterialValueUnitAnnotator:
