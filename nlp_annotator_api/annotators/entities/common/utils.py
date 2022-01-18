@@ -36,7 +36,7 @@ def RegChemAnnotator(paragraph):
 
 
 
-    pattern = '([A-Z]{3,})|(([\d\.]{1,}(K|MPa|kPa)|([\d\.]{1,} (K|MPa|kPa))))|([A-Z]*[CP]-[A-Z\d]*)|(\d{3,}C)|GC|As |([A-Z]+[\.-]+)'
+    pattern = '([A-Z]{3,})|(([\d\.]{1,}(K|MPa|kPa)|([\d\.]{1,} (K|MPa|kPa))))|([A-Z]*[CP]-[A-Z\d]*)|(\d{3,}C)|GC|As |SATP|STP|NTP|([A-Z]+[\.-]+)'
     pattern_re = re.compile(pattern)
     regex = pattern_re.finditer(paragraph)
 
@@ -112,22 +112,45 @@ def RegChemAnnotator(paragraph):
                 newlist.append(tmplist)
     return newlist
 
-def RegValueAnnotator(paragraph):
+def RegValueUnitAnnotator(paragraph):
+    value_pattern = '(([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-)+(?=\d)))*'
+    unit_pattern = '((?<=\d)|(?<=\d )|(?<=\$))(((mL\s*min-\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$\s*h\s*1|s\s*\$\^\{1\}\$|μ\s*mol\s*g\s*\$\^\{1\}\$s\s*\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$h \$\^\{1\}\$|(μ|u)\s*mol\s*g\s*(-\s*1|\-*\$\^\{\-*1\}\$)\s*s\s*(-\s*1|\-*\$\^\{\-*1\}\$)|cm\s*(3|\$\^\{3\}\$)\s*\/\s*g|m\s*(2|\$\^\{2\}\$)\s*\/\s*g|(μ|u)\s*mol|kJ\s*\/\s*mol|cm\s*(-\s*1|\-*\$\^\{\-*1\}\$)|g\s*\/\s*cm\s*(3|\$\^\{3\}\$)|s\s*\-*(\-1|\$\^\{\-*1\}\$)|MPa|kPa|h|H|%|mL|ml|g|min||sec|L|mg|wt\s*%|vol\s*%|mm|nm|km|cm|m|kJ\/mol|° C|eV|K|Å|°|θ)(?![a-z]))+)'
+    pattern_re = re.compile(unit_pattern)
+    parser = pattern_re
+    regex = parser.finditer(paragraph)
     exlist = []
-    ex_in_list = []
-    pattern = '([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?))'
-    pattern_re = re.compile(pattern)
+    for reg in regex:
+        if not reg.group() == '':
+            exlist.append([reg.start(), reg.end(), reg.group(), 'unit', reg.group(), False, None])
+
+    exlist = list(map(list, set(map(tuple, exlist))))
+    unitlist = sorted(exlist)
+
+    exlist = []
+    pattern_re = re.compile(value_pattern)
     parser = pattern_re
     regex = parser.finditer(paragraph)
     for reg in regex:
-        exlist.append([reg.start(), reg.end(), reg.group(), 1])
-
+        if not reg.group() == '':
+            exlist.append([reg.start(), reg.end(), reg.group(), "value"])
     exlist = list(map(list, set(map(tuple, exlist))))
     exlist = sorted(exlist)
+    valuelist = revaluelist(connectlist(exlist))
 
-    def is_overlap(start1, end1, start2, end2):
-        return start1 <= end2 and end1 >= start2
+    exlist = []
+    exlist.extend(valuelist)
+    exlist.extend(unitlist)
+    valueunitlist = valueunit(exlist)
+    return valueunitlist
 
+
+def is_overlap(start1, end1, start2, end2):
+    return start1 <= end2 and end1 >= start2
+
+def connectlist(exlist):
+    exlist = list(map(list, set(map(tuple, exlist))))
+    exlist = sorted(exlist)
+        
     tmplist = []
     newlist = []
     for i in range(0, len(exlist)):
@@ -142,20 +165,22 @@ def RegValueAnnotator(paragraph):
                     else:
                         max = listb
                         min = lista
+                    
+                    unit = max[3]
+
 
                     if min[0] < max[0]:
                         gap = max[0] - min[0]
                         newword = min[2][0:gap] + max[2]
-                        tmplist = [min[0], max[1], newword, max[3]]
+                        tmplist = [min[0], max[1], newword, unit]
                     elif min[0] >= max[0] and min[1] <= max[1]:
-                        tmplist = [max[0], max[1], max[2], max[3]]
+                            tmplist = [max[0], max[1], max[2], unit]
                     elif min[1] > max[1]:
                         gap = min[1] - max[1]
-                        newword = max[2] + min[2][gap-1:len(min[2])]
-                        tmplist = [max[0], min[1], newword, max[3]]
+                        newword = max[2] + min[2][gap-len(min[2]):len(min[2])]
+                        tmplist = [max[0], min[1], newword, unit]
                 else:
-                    if exlist[i][3] == 1:
-                        newlist.append(exlist[i])
+                    newlist.append(exlist[i])
             else:
                 lista = tmplist
                 listb = exlist[i+1]
@@ -167,34 +192,103 @@ def RegValueAnnotator(paragraph):
                         max = listb
                         min = lista
 
+                    unit = max[3]
+
                     if min[0] < max[0]:
                         gap = max[0] - min[0]
                         newword = min[2][0:gap] + max[2]
-                        tmplist = [min[0], max[1], newword, max[3]]
+                        tmplist = [min[0], max[1], newword, unit]
                     elif min[0] >= max[0] and min[1] <= max[1]:
-                        tmplist = [max[0], max[1], max[2], max[3]]
+                        tmplist = [max[0], max[1], max[2], unit]
                     elif min[1] > max[1]:
                         gap = min[1] - max[1]
-                        newword = max[2] + min[2][gap-1:len(min[2])]
-                        tmplist = [max[0], min[1], newword, max[3]]
+                        newword = max[2] + min[2][gap-len(min[2]):len(min[2])]
+                        tmplist = [max[0], min[1], newword, unit]
                 else:
-                    if tmplist[3] == 1:
-                        newlist.append(tmplist)
+                    newlist.append(tmplist)
                     tmplist = []
         else:
-            newlist.append(exlist[i])
+            if tmplist == []:
+                newlist.append(exlist[i])
+            else:
+                newlist.append(tmplist)
+    return newlist
 
 
-    pattern_inverse = '((?<=\$[_^]{)\d+?(?=}\$))|((?<=\[)(\-*\d+)+?(?=\]))|((?<=figure)|((?<=Figure)|(?<=fig)|(?<=Fig)|(?<=figure\.)|(?<=Figure\.)|(?<=fig\.)|(?<=Fig\.)|(?<=table)|(?<=Table)|(?<=table\.)|(?<=Table\.))( \d+|\d+)(\.|))'
-    pattern_re = re.compile(pattern_inverse)
-    parser = pattern_re
-    regex = parser.finditer(paragraph)
-    for reg in regex:
-        newlist.append([reg.start(), reg.end(), reg.group(), 1])
+def valueunit(exlist):
+    exlist = list(map(list, set(map(tuple, exlist))))
+    exlist = sorted(exlist)
+        
+    newlist = []
+    for i in range(0, len(exlist)):
+        if not i == len(exlist)-1:
+            lista = exlist[i]
+            listb = exlist[i+1]
+            if lista[3]=="value" and listb[3]=="unit":
+                if lista[1]+1 == listb[0]:
+                    newword = lista[2] + ' ' + listb[2]
+                    valueunit = [lista[0], listb[1], newword, "value + unit", listb[4], lista[5], lista[6]]
+                    newlist.append(valueunit)
+                elif lista[1] == listb[0]:
+                    newword = lista[2] + listb[2]
+                    valueunit = [lista[0], listb[1], newword, "value + unit", listb[4], lista[5], lista[6]]
+                    newlist.append(valueunit)
+            elif lista[3] == "value" and not listb[3] == 'unit':
+                    valueunit = lista
+                    newlist.append(valueunit)
+        else:
+            if exlist[i][3] == 'value':
+                newlist.append(exlist)
+                
 
-    finallist = []
-    for new in newlist:
-        if newlist.count(new) == 1:
-            finallist.append(new)
-    
-    return finallist
+
+            
+                    
+    return newlist
+
+def uniformvalue(value):
+    if bool(re.search('(X|x|×|GLYPH<[A-Z]+\d+>)', value)):
+        if bool(re.search('(E|e|10)\s*((?=\-)|(?=\+)|(?=\$))', value)):
+            tmplist = re.split('(X|x|×|GLYPH<[A-Z]+\d+>)', value)
+            revalue = float(tmplist[0]) * 10 ** int(re.sub('[\s\$\^\{\}]', '', re.split('E|e|10',tmplist[-1])[-1]))
+        else:
+            tmplist = re.split('(X|x|×|GLYPH<[A-Z]+\d+>)', value)
+            revalue = float(tmplist[0]) * float(tmplist[-1])            
+    else:
+        if bool(re.search('((E|e|10)\s*)((?=\-)|(?=\+)|(?=\$))', value)):
+            tmplist = re.split('E|e|10', value)
+            if tmplist[0] == '':
+                revalue = 10 ** int(re.sub('[\s\$\^\{\}]', '', tmplist[-1]))
+            else:
+                revalue = float(tmplist[0]) * 10 ** int(re.sub('[\s\$\^\{\}]', '', tmplist[-1]))
+        else:
+            revalue = float(value)
+    return revalue
+
+
+def revaluelist(valuelist):
+    exlist = []
+    for value in valuelist:
+        flag = 0
+        if value[2][0] == ' ':
+            value[0] = value[0]+1
+            value[2] = value[2][1:len(value[2])]
+        if bool(re.search('(and|to|&)\s*(?=\d)', value[2])):
+            tmpvalue = re.split('(and|to|&)\s*(?=\d)', value[2])
+            revalue = (uniformvalue(tmpvalue[0]) + uniformvalue(tmpvalue[2]))/2
+            flag = 1
+        elif bool(re.search('(?<!10)\-\s*(?=\d)', value[2])):
+            revalue = (float(value[2].split('-')[0])+float(value[2].split('-')[1]))/2
+            flag = 1
+        elif bool(re.search('\/', value[2])):
+            tmpvalue = re.split('\/', value[2])
+            revalue = float(tmpvalue[0])/float(tmpvalue[2])
+        else:
+            revalue = uniformvalue(value[2])
+        if flag == 1:
+            tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
+        else:
+            tmplist = [value[0], value[1], value[2], 'value', 'no unit', False, revalue]
+        exlist.append(tmplist)
+
+    return exlist
