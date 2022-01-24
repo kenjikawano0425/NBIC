@@ -25,7 +25,6 @@ class ValueUnitAnnotator:
 
         #implement CDE
         doc = self.parser(text)
-        doc = doc[0:-1]
 
         for cem in doc:
 

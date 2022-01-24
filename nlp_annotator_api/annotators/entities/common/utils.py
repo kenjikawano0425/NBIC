@@ -238,7 +238,7 @@ def valueunit(exlist):
                     newlist.append(valueunit)
         else:
             if exlist[i][3] == 'value':
-                newlist.append(exlist)
+                newlist.append(exlist[i])
                 
 
 
