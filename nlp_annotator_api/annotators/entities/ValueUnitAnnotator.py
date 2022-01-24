@@ -20,17 +20,16 @@ class ValueUnitAnnotator:
 
     def annotate_entities_text(self, text:str):
 
-        #print(text)
 
         ents=[]
 
         #implement CDE
         doc = self.parser(text)
+        doc = doc[0:-1]
 
         for cem in doc:
 
             name = cem[2]
-
             t0 = cem[0]
             t1 = cem[1]
 
