@@ -3,20 +3,20 @@ import re
 #from types import _T1
 from typing import Any, Optional
 from .common.utils import resources_dir
-from .common.utils import RegValueUnitAnnotator
+from .common.utils import RegValueAnnotator
 
-class ValueUnitAnnotator:
+class ValueAnnotator:
     
     def key(self) -> str:
-        return "value+units"
+        return "values"
 
     def description(self) -> str:
-        return "finding value+units, where 3 options, float_value(500, 0.05), unit(mg, km) and range_bool(and, to, -)."
+        return "finding values, where 2 options, float_value(500, 0.05), range_bool(and, to, -)."
 
     def __init__(self):
 
         # init CDE
-        self.parser = RegValueUnitAnnotator
+        self.parser = RegValueAnnotator
 
     def annotate_entities_text(self, text:str):
 
@@ -36,7 +36,7 @@ class ValueUnitAnnotator:
                 "match": name,
                 "range": [t0,t1],
                 "original": text[t0:t1],
-                "type":"value+units",
+                "type":"values",
                 "unit":cem[4],
                 "range_bool":cem[5],
                 "float_value":cem[6]

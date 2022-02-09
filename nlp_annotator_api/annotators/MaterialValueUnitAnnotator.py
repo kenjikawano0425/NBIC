@@ -13,6 +13,7 @@ from typing import List, Optional
 
 from .entities.MaterialAnnotator import MaterialAnnotator
 from .entities.ValueUnitAnnotator import ValueUnitAnnotator
+from .entities.ValueAnnotator import ValueAnnotator
 from .entities.PropertiesAnnotator import PropertiesAnnotator
 
 from .relationships.MaterialtoValueUnittoPropertiesAnnotator import MaterialtoValueUnittoPropertiesAnnotator
@@ -26,6 +27,7 @@ class MaterialValueUnitAnnotator:
     _ent_annotator_classes = [
         MaterialAnnotator,
         ValueUnitAnnotator,
+        ValueAnnotator,
         PropertiesAnnotator
         ]
 
