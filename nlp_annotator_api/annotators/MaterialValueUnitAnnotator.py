@@ -13,19 +13,24 @@ from typing import List, Optional
 
 from .entities.MaterialAnnotator import MaterialAnnotator
 from .entities.ValueUnitAnnotator import ValueUnitAnnotator
+from .entities.PropertiesAnnotator import PropertiesAnnotator
+
+from .relationships.MaterialtoValueUnittoPropertiesAnnotator import MaterialtoValueUnittoPropertiesAnnotator
 
 
 class MaterialValueUnitAnnotator:
     ## This is the class name that you need to use in the controller.
 
-    supports = ('text', )
+    supports = ('text', 'table', )
 
     _ent_annotator_classes = [
         MaterialAnnotator,
-        ValueUnitAnnotator
+        ValueUnitAnnotator,
+        PropertiesAnnotator
         ]
 
     _rel_annotator_classes = [
+        MaterialtoValueUnittoPropertiesAnnotator
     ]
 
     def __init__(self):
@@ -123,17 +128,28 @@ class MaterialValueUnitAnnotator:
         return results
 
     def annotate_entities(self, object_type, item, desired_entities: List[str]) -> list:
-        ## Annotate one item with the desired entities.
-        ## Output: List of entities in CPS format, different for text, table, or images
         if object_type == "text":
             matched_entities = []
             for entity_name in desired_entities:
                 matched_entities.extend(self._ent_annots[entity_name].annotate_entities_text(item))
             return matched_entities
-        # elif object_type == "table":
-        #     return self.annotate_entities_table(item, desired_entities)
+        elif object_type == "table":
+            return self.annotate_entities_table(item, desired_entities)
         ## By the validation code in 'annotate_controller.py' no other object_type can get here. 
 
+    def annotate_entities_table(self, table: List[List[dict]], desired_entities: List[str]) -> list:
+        table_entities = []
+        for i, row in enumerate(table):
+            for j, cell in enumerate(row): 
+                text_entities = self.annotate_entities("text", cell["text"], desired_entities)
+                for entity in text_entities:
+                    entity["cell_type"] = cell["type"]
+                    entity["coords"] = cell["spans"]
+                    entity["prov"] = "data"
+                    entity["source_field"] = "data"
+                    entity["source_field_type"] = "table"
+                    table_entities.append(entity)
+        return table_entities
 
     def annotate_batched_relationships(self, texts: List[str], entities: List[dict], relationship_names: Optional[List[str]]) -> List[dict]:
         if relationship_names is None:
