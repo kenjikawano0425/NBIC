@@ -24,6 +24,11 @@ class MaterialValueUnitAnnotator:
 
     supports = ('text', 'table', )
 
+    _DATA_FIELDS = {
+        'value+units':["float_value", "unit", "range_bool"],
+        'materials':["element_list", "ratio"]
+        }
+
     _ent_annotator_classes = [
         MaterialAnnotator,
         ValueUnitAnnotator,
@@ -59,14 +64,29 @@ class MaterialValueUnitAnnotator:
         return self.labels
 
     def _generate_annotator_labels(self):
-        # Derive entity labels from classes    
-        entities_with_desc = [
-            {
-                "key": annot.key(), 
-                "description": annot.description()
-            }
-            for annot in self._ent_annots.values()
-        ]
+        # Derive entity labels from classes
+        entities_with_desc = []
+        for annot in self._ent_annots.values():
+            try:
+                if annot.key() in self._DATA_FIELDS:
+                    data_fields_exists = True
+                else:
+                    data_fields_exists = False
+            except:
+                data_fields_exists = False
+            
+            if data_fields_exists:
+                d = {
+                    "key": annot.key(), 
+                    "description": annot.description(),
+                    "data_fields": self._DATA_FIELDS[annot.key()]
+                }
+            else:
+                d = {
+                    "key": annot.key(), 
+                    "description": annot.description()
+                }
+            entities_with_desc.append(d)
         # Dummy implementation of property labels    
         property_names = self.get_property_names()
         properties_with_desc = [{"key": property, "description": f"Property of type {property!r}"} for property in property_names]

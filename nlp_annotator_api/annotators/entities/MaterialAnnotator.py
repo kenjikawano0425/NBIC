@@ -39,7 +39,9 @@ class MaterialAnnotator:
                 "match": name,
                 "range": [t0,t1],
                 "original": text[t0:t1],
-                "type":"materials"
+                "type":"materials",
+                "element_list":"test",
+                "ratio":"test"
             }
             ents.append(ent)
 
