@@ -30,6 +30,8 @@ https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_ner_bc5cdr
 
 chemdataextractor==1.3.0
 
+Inflector==3.0.1
+
 pydantic==1.8.2
 aioredis[hiredis]==2.0.0
 requests~=2.24.0

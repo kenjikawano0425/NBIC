@@ -2,7 +2,8 @@ import os
 from unicodedata import unidata_version
 from chemdataextractor import Document
 import re
-
+import json
+from inflector import Inflector
 
 resources_dir = os.path.abspath(
     os.path.join(
@@ -10,6 +11,45 @@ resources_dir = os.path.abspath(
         "../../../resources"
     )
 )
+
+
+def RegPropertiesAnnotator(paragraph):
+
+    exlist = []
+    dictionary_filename=os.path.join(resources_dir, "properties_resource.json")
+    json_open = open(dictionary_filename, 'r')
+    json_load = json.load(json_open)
+    for jsondata in json_load:
+        jsondata['_synonyms'].append(jsondata['_name'])
+
+        jsondata['_synonyms'].append(jsondata['_name'].capitalize())
+        jsondata['_synonyms'].append(jsondata['_name'].upper())
+        jsondata['_synonyms'].append(jsondata['_name'].lower())
+        jsondata['_synonyms'].append(jsondata['_name'].title())
+
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].capitalize()))
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].upper()))
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].lower()))
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].title()))
+
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).capitalize())
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).upper())
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).lower())
+        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).title())
+
+        jsondata['_synonyms'] = list(set(jsondata['_synonyms']))
+
+        pro_pattern = '|'.join(jsondata['_synonyms'])
+        pattern_re = re.compile(pro_pattern)
+        parser = pattern_re
+        regex = parser.finditer(paragraph)
+        for reg in regex:
+            if not reg.group() == '':
+                exlist.append([reg.start(), reg.end(), reg.group(), "properties"])
+                exlist.append([reg.start(), reg.end(), reg.group(), jsondata['_name']])
+        
+    return exlist
+
 
 def RegValueAnnotator(paragraph):
     value_pattern = '(([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-)+(?=\d)))*'
@@ -35,7 +75,7 @@ def RegChemAnnotator(paragraph):
         exlist.append([text.start, text.end, text.text, 1])
 
 
-    pattern = '((\$[_^]{[\d+-]{0,}}\$|[()\/\-\+])*((He|Li|Be|Ne|Na|Mg|Al|Si|Cl|Ar|Ca|Sc|Ti|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|H|B|C|N|O|F|P|S|K|V|I|W|U|Y|X)(\$[_^]{([\d+-]|[a-z])*}\$|[()\/\-\+\d\: ])*)+)'
+    pattern = '((\$[_^]{[\d+-]{0,}}\$|[()\/\-\+])*((s@|He|Li|Be|Ne|Na|Mg|Al|Si|Cl|Ar|Ca|Sc|Ti|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|Hb|M|H|B|C|N|O|F|P|S|K|V|I|W|U|Y|X)(\$[_^]{([+-]|[a-z]|\d\.*\d*)*}\$|[()\/\-\+\d\: ])*)+)'
     pattern_re = re.compile(pattern)
     regex = pattern_re.finditer(paragraph)
     for reg in regex:
@@ -52,7 +92,7 @@ def RegChemAnnotator(paragraph):
             exlist.append([reg.start(), reg.end(), reg.group(), 1])
 
 
-    pattern = '([A-Z]{3,})|(([\d\.]{1,}(K|MPa|kPa)|([\d\.]{1,} (K|MPa|kPa))))|([A-Z]*[CP]-[A-Z\d]*)|(\d{3,}C)|GC|As |In |SATP|STP|NTP|([A-Z]+[\.-]+)'
+    pattern = '(Li|He),\s*[A-Z]\.|(([\d\.]{1,}(K|MPa|kPa)|([\d\.]{1,} (K|MPa|kPa))))|Re V\.*|J\.\s*(Mol|Am|Phys)\.|(\d{3,}C)|GC|As |In |At |TOF|SATP|STP|NTP|SMF|O\'Neill|CrossRef|PubMed|DI|II|XPS|ICP\-OES|QP\-5000|GC\-MS|F\-T|JEOL|DOI|S\/N|A\/F|(JP|US)\d{2,}[A-Z]|([A-Z]+[\.-]+)|([A-Z]*[CP]-[A-Z\d]*)|([A-Z]{3,})|\d+\s*((k|M|m|n)*eV|C|° C|\$\^\{◦\}\$\s*C)|(B|C),*\s*[12][09]\d{2}|((F|f)igure(s)*|(F|f)ig|(T|t)able(s)*)[\,\.\s\dA-Z\-]*(and)*[\,\.\s\d\-]*[A-Z\d]*'
     pattern_re = re.compile(pattern)
     regex = pattern_re.finditer(paragraph)
 
@@ -81,6 +121,9 @@ def RegChemAnnotator(paragraph):
                     else:
                         max = listb
                         min = lista
+                    
+                    if max[3] == 0 or min[3] == 0:
+                        max[3] = 0
 
                     if min[0] < max[0]:
                         gap = max[0] - min[0]
@@ -105,6 +148,10 @@ def RegChemAnnotator(paragraph):
                     else:
                         max = listb
                         min = lista
+
+                    if max[3] == 0 or min[3] == 0:
+                        max[3] = 0
+
 
                     if min[0] < max[0]:
                         gap = max[0] - min[0]
@@ -134,10 +181,10 @@ def RegChemAnnotator(paragraph):
             newlist[i][1] = check[1]-1
             newlist[i][2] = check[2][0:len(check[2])-1]
         elif not check[2][-1] == ')' and check[2][0] == '(':
-            newlist[i][0] = check[1]+1
+            newlist[i][0] = check[0]+1
             newlist[i][2] = check[2][1:len(check[2])]
         elif check[2][-1] == ')' and check[2][0] == '(':
-            newlist[i][0] = check[1]+1
+            newlist[i][0] = check[0]+1
             newlist[i][1] = check[1]-1
             newlist[i][2] = check[2][1:len(check[2])-1]
         
@@ -145,16 +192,15 @@ def RegChemAnnotator(paragraph):
             newlist[i][1] = check[1]-1
             newlist[i][2] = check[2][0:len(check[2])-1]
         if check[2][0] in ['/', '-', '.']:
-            newlist[i][0] = check[1]+1
+            newlist[i][0] = check[0]+1
             newlist[i][2] = check[2][1:len(check[2])]
-
 
          
     return newlist
 
 def RegValueUnitAnnotator(paragraph):
     value_pattern = '(([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-|,)+(?=\d)))*'
-    unit_pattern = '((?<=\d)|(?<=\d )|(?<=\$))(((mL\s*g\s*\$\_{cat}\$-1\s*h-\$\^{1}\$|kJ\s*mol\s*-\$\^\{1\}\$|m\s*\$\^\s*\{2\}\$\s*g\s*-\s*\$\^\{1\}\$|m(L|l)\s*min-\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$\s*h\s*1|s\s*\$\^\{1\}\$|μ\s*mol\s*g\s*\$\^\{1\}\$s\s*\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$h \$\^\{1\}\$|(μ|u)\s*mol\s*g\s*(-\s*1|\-*\$\^\{\-*1\}\$)\s*s\s*(-\s*1|\-*\$\^\{\-*1\}\$)|cm\s*(3|\$\^\{3\}\$)\s*\/\s*g|m\s*(2|\$\^\{2\}\$)\s*\/\s*g|(μ|u)\s*mol|kJ\s*\/\s*mol|cm\s*(-\s*1|\-*\$\^\{\-*1\}\$)|g\s*\/\s*cm\s*(3|\$\^\{3\}\$)|s\s*\-*(\-1|\$\^\{\-*1\}\$)|C\s*m\s*i\s*n\s*-\$\^\{1\}\$|C\s*min-1|h-1|M\s*Pa|k\s*Pa|m\s*Pa|(h|H)|%|m\s*(L|l)\s*\/\s*min|m(L|l)|g|m\s*i\s*n|sec|L|m\s*g|wt\s*%|vol\s*%|mol\s*%|(µ|u)\s*m|m\s*m|n\s*m|k\s*m|(c|C)\s*m|m|kJ\s*\/\s*mol|° C|C|\$\^{◦}\$\s*C|eV|K|Å|°|θ)((?=to)|(?![a-z])))+)'
+    unit_pattern = '((?<=\d)|(?<=\d )|(?<=\$))(((atom\s*atom\-\$\^\{\d\}\$|K\s*min\-\$\^\{\d\}\$|m\s*\d\s*g\-\$\^\{\d\}\$|mL\s*g\-\$\^\{\d\}\$|mL\s*g\s*\$\_\{cat\}\$-1\s*h-\$\^\{1\}\$|kJ\s*mol\s*-\$\^\{1\}\$|m\s*\$\^\s*\{2\}\$\s*g\s*-\s*\$\^\{1\}\$|m(L|l)\s*min-\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$\s*h\s*1|s\s*\$\^\{1\}\$|μ\s*mol\s*g\s*\$\^\{1\}\$s\s*\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$h \$\^\{1\}\$|(μ|u)\s*mol\s*g\s*(-\s*1|\-*\$\^\{\-*1\}\$)\s*s\s*(-\s*1|\-*\$\^\{\-*1\}\$)|cm\s*(3|\$\^\{3\}\$)\s*\/\s*g|m\s*(2|\$\^\{2\}\$)\s*\/\s*g|(μ|u)\s*mol|kJ\s*\/\s*mol|cm\s*(-\s*1|\-*\$\^\{\-*1\}\$)|g\s*\/\s*cm\s*(3|\$\^\{3\}\$)|s\s*\-*(\-1|\$\^\{\-*1\}\$)|C\s*m\s*i\s*n\s*-\$\^\{1\}\$|C\s*min-1|h-1|M\s*Pa|k\s*Pa|m\s*Pa|(h|H)|%|m\s*(L|l)\s*\/\s*min|m(L|l)|g|m\s*i\s*n|atom\-\$\^\{\d\}\$|atom|ppm|ml\s*min\s*-1|h\s*-\$\^\{1\}\$|mol\s*l\s*-1|mA|kV|sec|m\s*g|wt\s*%|vol\s*%|mol\s*%|(µ|u)\s*m|m\s*m|n\s*m|k\s*m|(c|C)\s*m|m|kJ\s*\/\s*mol|° C|C|\$\^{◦}\$\s*C|eV|L|s|K|Å|°|θ)((?=to)|(?![a-z])))+)'
     pattern_re = re.compile(unit_pattern)
     parser = pattern_re
     regex = parser.finditer(paragraph)
@@ -315,8 +361,13 @@ def uniformvalue(value):
             else:
                 revalue = float(tmplist[0]) * 10 ** float(re.sub('[\s\$\^\{\}]', '', tmplist[-1]))
         else:
-            if not len(value.split(".")) > 2:
+            try:
+                revalue = eval(re.sub(' ', '', value))
+            except SyntaxError:
                 revalue = float(re.sub(' ', '', value))
+            except ValueError:
+                print("warning:{0}, this is not value:{1}".format("ValueError", value[2]))
+                revalue = 0
     return revalue
 
 
@@ -331,36 +382,39 @@ def revaluelist(valuelist):
             if bool(re.search('(?<=\d)\s6\s(?=\d)', value[2])):
                 revalue = value[2].split(" 6 ")[0]
                 flag = 1
-            elif not len(value[2].split('.')) > 2:
-                if bool(re.search('and|to|&|,', value[2])):
-                    tmpvalues = re.split('and|to|&|,', value[2])
-                    for i, tmpvalue in enumerate(tmpvalues):
-                        if bool(re.search('\d', tmpvalue)):
-                            if bool(re.search('((?<![Ee])(?<!10))\-\s*(?=\d)', tmpvalue)):
-                                if tmpvalue[0] == "-":
-                                    revalue = uniformvalue(tmpvalue)
-                                else:
-                                    revalue = (uniformvalue(tmpvalue.split('-')[0])+uniformvalue(tmpvalue.split('-')[1]))/2
-                            else:
+            elif bool(re.search('and|to|&|,', value[2])):
+                splitvalue = value[2]
+                regex = re.finditer(',', splitvalue)
+                offset = 0
+                for reg in regex:
+                    if not splitvalue[reg.start()-offset+1]==' ':
+                        replace_tmp = list(splitvalue)
+                        replace_tmp[reg.start()-offset] = ''
+                        splitvalue = ''.join(replace_tmp)
+                        offset = offset + 1
+                tmpvalues = re.split('and|to|&|,', splitvalue)
+                for i, tmpvalue in enumerate(tmpvalues):
+                    if bool(re.search('\d', tmpvalue)):
+                        if bool(re.search('((?<![Ee])(?<!10))\-\s*(?=\d)', tmpvalue)):
+                            if tmpvalue[0] == "-":
                                 revalue = uniformvalue(tmpvalue)
-                            tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
-                            exlist.append(tmplist)
-                    continue
+                            else:
+                                revalue = (uniformvalue(tmpvalue.split('-')[0])+uniformvalue(tmpvalue.split('-')[1]))/2
+                        else:
+                            revalue = uniformvalue(tmpvalue)
+                        tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
+                        exlist.append(tmplist)
+                continue
 
-                elif bool(re.search('((?<![Ee])(?<!10))\-\s*(?=\d)', value[2])):
-                    if value[2][0] == "-":
-                        revalue = uniformvalue(value[2])
-                        flag = 0
-                    else:
-                        revalue = (uniformvalue(re.sub(' ', '', value[2].split('-')[0]))+uniformvalue(re.sub(' ', '', value[2].split('-')[1])))/2
-                        flag = 1
-                elif bool(re.search('\/|\+|\-', value[2])):
-                    revalue = eval(value[2])
-                else:
+            elif bool(re.search('((?<![Ee])(?<!10))\-\s*(?=\d)', value[2])):
+                if value[2][0] == "-":
                     revalue = uniformvalue(value[2])
-            elif (len(value[2].split('.')) == 3) and bool(re.search('((?<![Ee])(?<!10))\-\s*(?=\d)', value[2])):
-                revalue = (uniformvalue(re.sub(' ', '', value[2].split('-')[0]))+uniformvalue(re.sub(' ', '', value[2].split('-')[1])))/2
-                flag = 1
+                    flag = 0
+                else:
+                    revalue = (uniformvalue(re.sub(' ', '', value[2].split('-')[0]))+uniformvalue(re.sub(' ', '', value[2].split('-')[1])))/2
+                    flag = 1
+            else:
+                revalue = uniformvalue(value[2])
         except ValueError:
             print("warning:{0}, this is not value:{1}".format("ValueError", value[2]))
             continue

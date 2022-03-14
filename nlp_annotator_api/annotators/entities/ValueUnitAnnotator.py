@@ -11,7 +11,7 @@ class ValueUnitAnnotator:
         return "value+units"
 
     def description(self) -> str:
-        return "finding value+units, where 3 options, float_value(500, 0.05), unit(mg, km) and range_bool(and, to, -)."
+        return "finding value+units, which can search float_value(500, 0.05) by filter node in query."
 
     def __init__(self):
 

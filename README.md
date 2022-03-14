@@ -156,13 +156,13 @@ Here is the request body in more readable format.
   "find_entities": {
     "object_type": "text",
     "entity_names": [
-        "cities", 
-        "countries", 
-        "provincies"      
+        "materials", 
+        "properties", 
+        "value+units"      
     ],
     "texts": [
-      "New Delhi is the capital of India.", 
-      "Baden-Württemberg is a state of Germany."
+      "La2BaO of TOFs is 100 s-1.", 
+      "$^{18}$O$_{2}$ is compounds, and 100eV."
       ]
   }
 }
