@@ -18,4 +18,5 @@
   {"_synonyms": ["Energy Barrier", "ENERGY BARRIER"], "_name": "energy barrier"},
   {"_synonyms": ["Light-off Temperature", "light off temperature"], "_name": "light-off temperature"},
   {"_synonyms": ["Density", "DENSITY"], "_name": "density"},
-  {"_synonyms": ["Band Gap", "BAND GAP", "BG", "band gaps"], "_name": "band gap"}]
+  {"_synonyms": ["Band Gap", "BAND GAP", "BG", "band gaps"], "_name": "band gap"}
+]

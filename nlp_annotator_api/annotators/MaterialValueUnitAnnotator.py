@@ -26,7 +26,7 @@ class MaterialValueUnitAnnotator:
 
     _DATA_FIELDS = {
         'value+units':["float_value"],
-        'values':["float_value"],
+        'values':["float_value"]
         }
 
     _ent_annotator_classes = [

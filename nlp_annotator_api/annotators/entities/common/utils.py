@@ -12,6 +12,7 @@ resources_dir = os.path.abspath(
     )
 )
 
+#nlpmodel-v-h/nlp_annotator_api/resources/properties_resource.json
 
 def RegPropertiesAnnotator(paragraph):
 
@@ -19,6 +20,7 @@ def RegPropertiesAnnotator(paragraph):
     dictionary_filename=os.path.join(resources_dir, "properties_resource.json")
     json_open = open(dictionary_filename, 'r')
     json_load = json.load(json_open)
+
     for jsondata in json_load:
         jsondata['_synonyms'].append(jsondata['_name'])
 
@@ -37,7 +39,7 @@ def RegPropertiesAnnotator(paragraph):
         jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).lower())
         jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).title())
 
-        jsondata['_synonyms'] = list(set(jsondata['_synonyms'])).sort(key=len, reverse=True)
+        jsondata['_synonyms'] = sorted(list(set(jsondata['_synonyms'])), key=len, reverse=True)
 
         pro_pattern = '|'.join(jsondata['_synonyms'])
         pattern_re = re.compile(pro_pattern)
