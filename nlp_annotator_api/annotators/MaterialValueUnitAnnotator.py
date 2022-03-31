@@ -25,7 +25,8 @@ class MaterialValueUnitAnnotator:
     supports = ('text', 'table', )
 
     _DATA_FIELDS = {
-        'value+units':["float_value"]
+        'value+units':["float_value"],
+        'values':["float_value"],
         }
 
     _ent_annotator_classes = [

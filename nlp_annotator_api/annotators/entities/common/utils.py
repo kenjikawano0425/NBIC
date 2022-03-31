@@ -37,7 +37,7 @@ def RegPropertiesAnnotator(paragraph):
         jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).lower())
         jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).title())
 
-        jsondata['_synonyms'] = list(set(jsondata['_synonyms']))
+        jsondata['_synonyms'] = list(set(jsondata['_synonyms'])).sort(key=len, reverse=True)
 
         pro_pattern = '|'.join(jsondata['_synonyms'])
         pattern_re = re.compile(pro_pattern)
@@ -66,7 +66,6 @@ def RegValueAnnotator(paragraph):
     return valuelist
 
 
-
 def RegChemAnnotator(paragraph):
     exlist = []
 
@@ -74,8 +73,7 @@ def RegChemAnnotator(paragraph):
     for text in doc.cems:
         exlist.append([text.start, text.end, text.text, 1])
 
-
-    pattern = '((\$[_^]{[\d+-]{0,}}\$|[()\/\-\+])*((s@|He|Li|Be|Ne|Na|Mg|Al|Si|Cl|Ar|Ca|Sc|Ti|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|Hb|M|H|B|C|N|O|F|P|S|K|V|I|W|U|Y|X)(\$[_^]{([+-]|[a-z]|\d\.*\d*)*}\$|[()\/\-\+\d\: ])*)+)'
+    pattern = '((\$[_^]{[\d+-]{0,}}\$|[\[\]\=()\/\-\+])*((YSZ|NWs|@|He|Li|Be|Ne|Na|Mg|Al|Si|Cl|Ar|Ca|Sc|Ti|Cr|Mn|Fe|Co|Ni|Cu|Zn|Ga|Ge|As|Se|Br|Kr|Rb|Sr|Zr|Nb|Mo|Tc|Ru|Rh|Pd|Ag|Cd|In|Sn|Sb|Te|Xe|Cs|Ba|La|Ce|Pr|Nd|Pm|Sm|Eu|Gd|Tb|Dy|Ho|Er|Tm|Yb|Lu|Hf|Ta|Re|Os|Ir|Pt|Au|Hg|Tl|Pb|Bi|Po|At|Rn|Fr|Ra|Ac|Th|Pa|Np|Pu|Am|Cm|Bk|Cf|Es|Fm|Md|No|Lr|Rf|Db|Sg|Bh|Hs|Mt|Ds|Rg|Cn|Nh|Fl|Mc|Lv|Ts|Og|Hb|M|H|B|C|N|O|F|P|S|K|V|I|W|U|Y|X)(\$[_^]\{([+-]|[a-z]|(\d\.*\d*))*\}\$|[\–\[\]()\/\-\+\.\d\: ])*)+)'
     pattern_re = re.compile(pattern)
     regex = pattern_re.finditer(paragraph)
     for reg in regex:
