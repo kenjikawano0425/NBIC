@@ -1,6 +1,7 @@
 # API
 aiohttp~=3.7.4
 connexion[swagger-ui]~=2.7.0
+Jinja2==3.0
 aiohttp_jinja2~=1.2.0
 
 # Metrics
