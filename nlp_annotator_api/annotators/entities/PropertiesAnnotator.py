@@ -1,8 +1,3 @@
-import os
-import re
-#from types import _T1
-from typing import Any, Optional
-from .common.utils import resources_dir
 from .common.utils import RegPropertiesAnnotator
 
 class PropertiesAnnotator:
@@ -20,13 +15,10 @@ class PropertiesAnnotator:
 
     def annotate_entities_text(self, text:str):
 
-        #print(text)
-
         ents=[]
 
         #implement CDE
         doc = self.parser(text)
-        #print(doc)
 
         for cem in doc:
 
@@ -36,7 +28,6 @@ class PropertiesAnnotator:
             t1 = cem[1]
 
             typename = cem[3]
-            print(typename)
 
 
             ent = {
@@ -47,11 +38,4 @@ class PropertiesAnnotator:
             }
             ents.append(ent)
 
-        #print(ents)
-
         return ents
-    
-
-#                "value" : 1,
-#                "unit" : "degree Celusius",
-#               "sentence" : " Li has conductivtiy 2e-4 mS at 1℃",

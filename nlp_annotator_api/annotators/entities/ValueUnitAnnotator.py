@@ -1,8 +1,3 @@
-import os
-import re
-#from types import _T1
-from typing import Any, Optional
-from .common.utils import resources_dir
 from .common.utils import RegValueUnitAnnotator
 
 class ValueUnitAnnotator:
@@ -43,11 +38,4 @@ class ValueUnitAnnotator:
             }
             ents.append(ent)
 
-        #print(ents)
-
         return ents
-    
-
-#                "value" : 1,
-#                "unit" : "degree Celusius",
-#               "sentence" : " Li has conductivtiy 2e-4 mS at 1℃",

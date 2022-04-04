@@ -15,6 +15,7 @@ from .entities.MaterialAnnotator import MaterialAnnotator
 from .entities.ValueUnitAnnotator import ValueUnitAnnotator
 from .entities.ValueAnnotator import ValueAnnotator
 from .entities.PropertiesAnnotator import PropertiesAnnotator
+from .entities.ChemDataExtractor import ChemDataExtractor
 
 from .relationships.MaterialtoValueUnittoPropertiesAnnotator import MaterialtoValueUnittoPropertiesAnnotator
 
@@ -33,7 +34,8 @@ class MaterialValueUnitAnnotator:
         MaterialAnnotator,
         ValueUnitAnnotator,
         ValueAnnotator,
-        PropertiesAnnotator
+        PropertiesAnnotator,
+        ChemDataExtractor
         ]
 
     _rel_annotator_classes = [

@@ -177,30 +177,33 @@ def RegChemAnnotator(paragraph):
     
 
     for i, check in enumerate(newlist):
-        if check[2][-1] == ')' and not bool(re.search('\(',check[2])):
-            newlist[i][1] = check[1]-1
-            newlist[i][2] = check[2][0:len(check[2])-1]
-        elif not check[2][-1] == ')' and check[2][0] == '(':
-            newlist[i][0] = check[0]+1
-            newlist[i][2] = check[2][1:len(check[2])]
-        elif check[2][-1] == ')' and check[2][0] == '(':
-            newlist[i][0] = check[0]+1
-            newlist[i][1] = check[1]-1
-            newlist[i][2] = check[2][1:len(check[2])-1]
-        
-        if check[2][-1] in ['(','/', '-', '.']:
-            newlist[i][1] = check[1]-1
-            newlist[i][2] = check[2][0:len(check[2])-1]
-        if check[2][0] in ['/', '-', '.']:
-            newlist[i][0] = check[0]+1
-            newlist[i][2] = check[2][1:len(check[2])]
+        if not bool(re.search('\(\)', check[2])):
+            if check[2][-1] == ')' and not bool(re.search('\(',check[2])):
+                newlist[i][1] = check[1]-1
+                newlist[i][2] = check[2][0:len(check[2])-1]
+            elif not check[2][-1] == ')' and check[2][0] == '(':
+                newlist[i][0] = check[0]+1
+                newlist[i][2] = check[2][1:len(check[2])]
+            elif check[2][-1] == ')' and check[2][0] == '(':
+                newlist[i][0] = check[0]+1
+                newlist[i][1] = check[1]-1
+                newlist[i][2] = check[2][1:len(check[2])-1]
+            
+            if check[2][-1] in ['(','/', '-', '.']:
+                newlist[i][1] = check[1]-1
+                newlist[i][2] = check[2][0:len(check[2])-1]
+            if check[2][0] in ['/', '-', '.']:
+                newlist[i][0] = check[0]+1
+                newlist[i][2] = check[2][1:len(check[2])]
+        else:
+            print("this is not material {}".format(check[2]))
 
          
     return newlist
 
 def RegValueUnitAnnotator(paragraph):
     value_pattern = '(([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-|,)+(?=\d)))*'
-    unit_pattern = '((?<=\d)|(?<=\d )|(?<=\$))(((atom\s*atom\-\$\^\{\d\}\$|K\s*min\-\$\^\{\d\}\$|m\s*\d\s*g\-\$\^\{\d\}\$|mL\s*g\-\$\^\{\d\}\$|mL\s*g\s*\$\_\{cat\}\$-1\s*h-\$\^\{1\}\$|kJ\s*mol\s*-\$\^\{1\}\$|m\s*\$\^\s*\{2\}\$\s*g\s*-\s*\$\^\{1\}\$|m(L|l)\s*min-\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$\s*h\s*1|s\s*\$\^\{1\}\$|μ\s*mol\s*g\s*\$\^\{1\}\$s\s*\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$h \$\^\{1\}\$|(μ|u)\s*mol\s*g\s*(-\s*1|\-*\$\^\{\-*1\}\$)\s*s\s*(-\s*1|\-*\$\^\{\-*1\}\$)|cm\s*(3|\$\^\{3\}\$)\s*\/\s*g|m\s*(2|\$\^\{2\}\$)\s*\/\s*g|(μ|u)\s*mol|kJ\s*\/\s*mol|cm\s*(-\s*1|\-*\$\^\{\-*1\}\$)|g\s*\/\s*cm\s*(3|\$\^\{3\}\$)|s\s*\-*(\-1|\$\^\{\-*1\}\$)|C\s*m\s*i\s*n\s*-\$\^\{1\}\$|C\s*min-1|h-1|M\s*Pa|k\s*Pa|m\s*Pa|(h|H)|%|m\s*(L|l)\s*\/\s*min|m(L|l)|g|m\s*i\s*n|atom\-\$\^\{\d\}\$|atom|ppm|ml\s*min\s*-1|h\s*-\$\^\{1\}\$|mol\s*l\s*-1|mA|kV|sec|m\s*g|wt\s*%|vol\s*%|mol\s*%|(µ|u)\s*m|m\s*m|n\s*m|k\s*m|(c|C)\s*m|m|kJ\s*\/\s*mol|° C|C|\$\^{◦}\$\s*C|eV|L|s|K|Å|°|θ)((?=to)|(?![a-z])))+)'
+    unit_pattern = '((?<=\d)|(?<=\d )|(?<=\$))(((atom\s*atom\-\$\^\{\d\}\$|K\s*min\-\$\^\{\d\}\$|m\s*\d\s*g\-\$\^\{\d\}\$|mL\s*g\-\$\^\{\d\}\$|mL\s*g\s*\$\_\{cat\}\$-1\s*h-\$\^\{1\}\$|kJ\s*mol\s*-\$\^\{1\}\$|m\s*\$\^\s*\{2\}\$\s*g\s*-\s*\$\^\{1\}\$|m(L|l)\s*min-\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$\s*h\s*1|s\s*\$\^\{1\}\$|μ\s*mol\s*g\s*\$\^\{1\}\$s\s*\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$h \$\^\{1\}\$|(m|μ|u)\s*mol\s*g\s*(-\s*1|\-*\$\^\{\-*1\}\$)\s*s\s*(-\s*1|\-*\$\^\{\-*1\}\$)|cm\s*(3|\$\^\{3\}\$)\s*\/\s*g|m\s*(2|\$\^\{2\}\$)\s*\/\s*g|(μ|u)\s*mol|kJ\s*\/\s*mol|cm\s*(-\s*1|\-*\$\^\{\-*1\}\$)|g\s*\/\s*cm\s*(3|\$\^\{3\}\$)|s\s*\-*(\-1|\$\^\{\-*1\}\$)|C\s*m\s*i\s*n\s*-\$\^\{1\}\$|C\s*min-1|h-1|M\s*Pa|k\s*Pa|m\s*Pa|(h|H)|%|m\s*(L|l)\s*\/\s*min|m(L|l)|g|m\s*i\s*n|atom\-\$\^\{\d\}\$|atom|ppm|ml\s*min\s*-1|h\s*-\$\^\{1\}\$|mol\s*l\s*-1|mA|kV|sec|m\s*g|wt\s*%|vol\s*%|mol\s*%|(µ|u)\s*m|m\s*m|n\s*m|k\s*m|(c|C)\s*m|m|kJ\s*\/\s*mol|° C|C|\$\^{◦}\$\s*C|eV|L|s|K|Å|°|θ)((?=to)|(?![a-z])))+)'
     pattern_re = re.compile(unit_pattern)
     parser = pattern_re
     regex = parser.finditer(paragraph)
@@ -395,7 +398,7 @@ def revaluelist(valuelist):
                 tmpvalues = re.split('and|to|&|,', splitvalue)
                 for i, tmpvalue in enumerate(tmpvalues):
                     if bool(re.search('\d', tmpvalue)):
-                        if bool(re.search('((?<![Ee])(?<!10))\-\s*(?=\d)', tmpvalue)):
+                        if bool(re.search('((?<![Ee])(?<!10)(?<![Ee]\s)(?<!10\s)(?<![Ee]\s\s)(?<!10\s\s))\-\s*(?=\d)', tmpvalue)):
                             if tmpvalue[0] == "-":
                                 revalue = uniformvalue(tmpvalue)
                             else:
@@ -406,7 +409,7 @@ def revaluelist(valuelist):
                         exlist.append(tmplist)
                 continue
 
-            elif bool(re.search('((?<![Ee])(?<!10))\-\s*(?=\d)', value[2])):
+            elif bool(re.search('((?<![Ee])(?<!10)(?<![Ee]\s)(?<!10\s)(?<![Ee]\s\s)(?<!10\s\s))\-\s*(?=\d)', value[2])):
                 if value[2][0] == "-":
                     revalue = uniformvalue(value[2])
                     flag = 0
@@ -416,7 +419,13 @@ def revaluelist(valuelist):
             else:
                 revalue = uniformvalue(value[2])
         except ValueError:
-            print("warning:{0}, this is not value:{1}".format("ValueError", value[2]))
+            #print("warning:{0}, this is not value:{1}".format("ValueError", value[2]))
+            continue
+        except ZeroDivisionError:
+            #print("warning:{0}, this is not value:{1}".format("ZeroDivisionError", value[2]))
+            continue
+        except OverflowError:
+            #print("warning:{0}, this is not value:{1}".format("OverflowError", value[2]))
             continue
 
         if flag == 1:
@@ -424,5 +433,15 @@ def revaluelist(valuelist):
         else:
             tmplist = [value[0], value[1], value[2], 'value', 'no unit', False, revalue]
         exlist.append(tmplist)
+
+    return exlist
+
+
+def ChemDataAnnotator(paragraph):
+    exlist = []
+
+    doc = Document(paragraph)
+    for text in doc.cems:
+        exlist.append([text.start, text.end, text.text])
 
     return exlist
