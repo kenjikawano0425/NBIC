@@ -371,6 +371,14 @@ def uniformvalue(value):
             except ValueError:
                 print("warning:{0}, this is not value:{1}".format("ValueError", value[2]))
                 revalue = 0
+
+    #solve MongoDB can only handle up to 8-byte ints
+    print(revalue)
+    if revalue >= 2e63-1:
+        revalue = 2e63-1
+    elif revalue <=-2e63+1:
+        revalue = -2e63+1
+
     return revalue
 
 
