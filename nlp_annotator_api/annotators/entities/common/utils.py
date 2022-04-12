@@ -12,8 +12,6 @@ resources_dir = os.path.abspath(
     )
 )
 
-#nlpmodel-v-h/nlp_annotator_api/resources/properties_resource.json
-
 def RegPropertiesAnnotator(paragraph):
 
     exlist = []
@@ -54,7 +52,7 @@ def RegPropertiesAnnotator(paragraph):
 
 
 def RegValueAnnotator(paragraph):
-    value_pattern = '(([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-)+(?=\d)))*'
+    value_pattern = '(([+\-]?)\s*(((10)\-?(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])?\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+)|(?<![a-zA-Z])(e|E)\-?\^?(?![a-zA-Z]))(\s*(E|e|((\s|\*|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\-?\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-|,)+(?=\d)))*'
     exlist = []
     pattern_re = re.compile(value_pattern)
     parser = pattern_re
@@ -202,8 +200,8 @@ def RegChemAnnotator(paragraph):
     return newlist
 
 def RegValueUnitAnnotator(paragraph):
-    value_pattern = '(([+\-]?)\s*(((10)(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+))(\s*(E|e|((\s|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-|,)+(?=\d)))*'
-    unit_pattern = '((?<=\d)|(?<=\d )|(?<=\$))(((atom\s*atom\-\$\^\{\d\}\$|K\s*min\-\$\^\{\d\}\$|m\s*\d\s*g\-\$\^\{\d\}\$|mL\s*g\-\$\^\{\d\}\$|mL\s*g\s*\$\_\{cat\}\$-1\s*h-\$\^\{1\}\$|kJ\s*mol\s*-\$\^\{1\}\$|m\s*\$\^\s*\{2\}\$\s*g\s*-\s*\$\^\{1\}\$|m(L|l)\s*min-\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$\s*h\s*1|s\s*\$\^\{1\}\$|μ\s*mol\s*g\s*\$\^\{1\}\$s\s*\$\^\{1\}\$|ml\s*g\s*\$\^\{1\}\$h \$\^\{1\}\$|(m|μ|u)\s*mol\s*g\s*(-\s*1|\-*\$\^\{\-*1\}\$)\s*s\s*(-\s*1|\-*\$\^\{\-*1\}\$)|cm\s*(3|\$\^\{3\}\$)\s*\/\s*g|m\s*(2|\$\^\{2\}\$)\s*\/\s*g|(μ|u)\s*mol|kJ\s*\/\s*mol|cm\s*(-\s*1|\-*\$\^\{\-*1\}\$)|g\s*\/\s*cm\s*(3|\$\^\{3\}\$)|s\s*\-*(\-1|\$\^\{\-*1\}\$)|C\s*m\s*i\s*n\s*-\$\^\{1\}\$|C\s*min-1|h-1|M\s*Pa|k\s*Pa|m\s*Pa|(h|H)|%|m\s*(L|l)\s*\/\s*min|m(L|l)|g|m\s*i\s*n|atom\-\$\^\{\d\}\$|atom|ppm|ml\s*min\s*-1|h\s*-\$\^\{1\}\$|mol\s*l\s*-1|mA|kV|sec|m\s*g|wt\s*%|vol\s*%|mol\s*%|(µ|u)\s*m|m\s*m|n\s*m|k\s*m|(c|C)\s*m|m|kJ\s*\/\s*mol|° C|C|\$\^{◦}\$\s*C|eV|L|s|K|Å|°|θ)((?=to)|(?![a-z])))+)'
+    value_pattern = '(([+\-]?)\s*(((10)\-?(\s+|(\$?\^))\s*(\$\^)?\{?\s*([+\-])?\s*(\$\^)?\{?\s*(\d+)\}?\$?)|(((\d+\.?\d*)|(\.\d+)|(?<![a-zA-Z])(e|E)\-?\^?(?![a-zA-Z]))(\s*(E|e|((\s|\*|X|x|×|((\$_{)?(GLYPH<[A-Z]+\d+>(}\$)?)))\s*10))\s*\-?\^?\s*(\$\^)?\{?\s*([+\-]?)\s*(\$\^)?\{?\s*(\d+)\}?\$?)?)))((( |to|and|\/|-|,)+(?=\d)))*'
+    unit_pattern = '(?<=[\d\$])\s?((p|n|(u|μ)|m|c|d|k|M|G|P)?(p\s*e\s*r\s*c\s*e\s*n\s*t\s*a\s*g\s*e|w\s*e\s*i\s*g\s*h\s*t|v\s*o\s*l\s*u\s*m\s*e|a\s*t\s*o\s*m|h\s*o\s*u\s*r|m\s*i\s*n|s\s*e\s*c|v\s*o\s*l|p\s*p\s*m|m\s*o\s*l|c\s*a\s*t|w\s*t|P\s*a|e\s*V|h|H|s|C|K|m|l|L|J|g|Å|θ|%|°|℃|V|A)+([\^\/\_\-\+\d\s\$\{\}])*)+((?=to)|(?![a-z]))'
     pattern_re = re.compile(unit_pattern)
     parser = pattern_re
     regex = parser.finditer(paragraph)
@@ -316,11 +314,11 @@ def valueunit(exlist):
             if lista[3]=="value" and listb[3]=="unit":
                 if lista[1]+1 == listb[0]:
                     newword = lista[2] + ' ' + listb[2]
-                    valueunit = [lista[0], listb[1], newword, "value + unit", listb[4], lista[5], lista[6]]
+                    valueunit = [lista[0], listb[1], newword, "value + unit", re.sub(' ', '', listb[4]), lista[5], lista[6]]
                     newlist.append(valueunit)
                 elif lista[1] == listb[0]:
                     newword = lista[2] + listb[2]
-                    valueunit = [lista[0], listb[1], newword, "value + unit", listb[4], lista[5], lista[6]]
+                    valueunit = [lista[0], listb[1], newword, "value + unit", re.sub(' ', '', listb[4]), lista[5], lista[6]]
                     newlist.append(valueunit)
                 
                 if exlist[i][5] == True:
@@ -330,11 +328,11 @@ def valueunit(exlist):
                                 lista = exlist[num]
                                 if lista[1]+1 == listb[0]:
                                     newword = lista[2] + ' ' + listb[2]
-                                    valueunit = [lista[0], listb[1], newword, "value + unit", listb[4], lista[5], lista[6]]
+                                    valueunit = [lista[0], listb[1], newword, "value + unit", re.sub(' ', '', listb[4]), lista[5], lista[6]]
                                     newlist.append(valueunit)
                                 elif lista[1] == listb[0]:
                                     newword = lista[2] + listb[2]
-                                    valueunit = [lista[0], listb[1], newword, "value + unit", listb[4], lista[5], lista[6]]
+                                    valueunit = [lista[0], listb[1], newword, "value + unit", re.sub(' ', '', listb[4]), lista[5], lista[6]]
                                     newlist.append(valueunit)
                             elif exlist[num][5] == False:
                                 continue
@@ -349,31 +347,24 @@ def valueunit(exlist):
     return newlist
 
 def uniformvalue(value):
-    if bool(re.search('(X|x|×|GLYPH<[A-Z]+\d+>)', value)):
-        if bool(re.search('(E|e|10)\s*((?=\-)|(?=\s)|(?=\+)|(?=\$))', value)):
-            tmplist = re.split('(X|x|×|GLYPH<[A-Z]+\d+>)', value)
-            revalue = float(tmplist[0]) * 10 ** int(re.sub('[\s\$\^\{\}]', '', re.split('E|E|e|10',tmplist[-1])[-1]))
+    if bool(re.search('(\*|X|x|×|GLYPH<[A-Z]+\d+>)', value)):
+        if bool(re.search('(E|e|10)\s*((?=\-)|(?=\^)|(?=\+)|(?=\$))', value)):
+            tmplist = re.split('(\*|X|x|×|GLYPH<[A-Z]+\d+>)', value)
+            revalue = float(re.sub('[\s\$\_\^\{\}]', '', tmplist[0])) * 10 ** int(re.sub('[\s\$\_\^\{\}]', '', re.split('E|E|e|10',tmplist[-1])[-1]))
         else:
-            tmplist = re.split('(X|×|x|×|GLYPH<[A-Z]+\d+>)', value)
-            revalue = float(tmplist[0]) * float(tmplist[-1])            
+            tmplist = re.split('(\*|X|x|×|GLYPH<[A-Z]+\d+>)', value)
+            revalue = float(re.sub('[\s\$\_\^\{\}]', '', tmplist[0])) * float(re.sub('[\s\$\_\^\{\}]', '', tmplist[-1]))
     else:
-        if bool(re.search('((E|E|e|10)\s*)((?=\-)|(?=\+)|(?=\$))', value)):
-            tmplist = re.split('E|e|10', value)
-            if tmplist[0] == '':
-                revalue = 10 ** int(re.sub('[\s\$\^\{\}]', '', tmplist[-1]))
+        if bool(re.search('((E|E|e|10)\s*)((?=\-)|(?=\+)|(?=\$)|(?=\^))', value)):
+            tmplist = re.split('E|E|e|10', value)
+            if not bool(re.search('\d', tmplist[0])):
+                revalue = 10 ** int(re.sub('[\s\$\^\{\}\_]', '', tmplist[-1]))
             else:
-                revalue = float(tmplist[0]) * 10 ** float(re.sub('[\s\$\^\{\}]', '', tmplist[-1]))
+                revalue = float(tmplist[0]) * 10 ** float(re.sub('[\s\$\^\{\}\_]', '', tmplist[-1]))
         else:
-            try:
-                revalue = eval(re.sub(' ', '', value))
-            except SyntaxError:
-                revalue = float(re.sub(' ', '', value))
-            except ValueError:
-                print("warning:{0}, this is not value:{1}".format("ValueError", value[2]))
-                revalue = 0
-
+            revalue = eval(re.sub(' ', '', value))
+    
     #solve MongoDB can only handle up to 8-byte ints
-    print(revalue)
     if revalue >= 2e63-1:
         revalue = 2e63-1
     elif revalue <=-2e63+1:
@@ -385,14 +376,15 @@ def uniformvalue(value):
 def revaluelist(valuelist):
     exlist = []
     for value in valuelist:
-        flag = 0
         if value[2][0] == ' ':
             value[0] = value[0]+1
             value[2] = value[2][1:len(value[2])]
+        
         try:
             if bool(re.search('(?<=\d)\s6\s(?=\d)', value[2])):
                 revalue = value[2].split(" 6 ")[0]
-                flag = 1
+                tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
+                exlist.append(tmplist)
             elif bool(re.search('and|to|&|,', value[2])):
                 splitvalue = value[2]
                 regex = re.finditer(',', splitvalue)
@@ -406,41 +398,43 @@ def revaluelist(valuelist):
                 tmpvalues = re.split('and|to|&|,', splitvalue)
                 for i, tmpvalue in enumerate(tmpvalues):
                     if bool(re.search('\d', tmpvalue)):
-                        if bool(re.search('((?<![Ee])(?<!10)(?<![Ee]\s)(?<!10\s)(?<![Ee]\s\s)(?<!10\s\s))\-\s*(?=\d)', tmpvalue)):
+                        if bool(re.search('((?<![Ee])(?<!10)(?<!\^)(?<!\{)(?<![Ee]\s)(?<!10\s)(?<!\^\s)(?<!\{\s))\-\s*(?=\d)', tmpvalue)):
                             if tmpvalue[0] == "-":
                                 revalue = uniformvalue(tmpvalue)
                             else:
-                                revalue = (uniformvalue(tmpvalue.split('-')[0])+uniformvalue(tmpvalue.split('-')[1]))/2
+                                revalue1 = uniformvalue(re.sub(' ', '', tmpvalue.split('-')[0]))
+                                tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue1]
+                                exlist.append(tmplist)
+                                revalue2 = uniformvalue(re.sub(' ', '', tmpvalue.split('-')[1]))
+                                tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue2]
+                                exlist.append(tmplist)
+                                continue
                         else:
                             revalue = uniformvalue(tmpvalue)
                         tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
                         exlist.append(tmplist)
-                continue
+                        continue
 
-            elif bool(re.search('((?<![Ee])(?<!10)(?<![Ee]\s)(?<!10\s)(?<![Ee]\s\s)(?<!10\s\s))\-\s*(?=\d)', value[2])):
+            elif bool(re.search('((?<![Ee])(?<!10)(?<!\^)(?<!\{)(?<![Ee]\s)(?<!10\s)(?<!\^\s)(?<!\{\s))\-\s*(?=\d)', value[2])):
                 if value[2][0] == "-":
                     revalue = uniformvalue(value[2])
-                    flag = 0
+                    tmplist = [value[0], value[1], value[2], 'value', 'no unit', False, revalue]
                 else:
-                    revalue = (uniformvalue(re.sub(' ', '', value[2].split('-')[0]))+uniformvalue(re.sub(' ', '', value[2].split('-')[1])))/2
-                    flag = 1
+                    revalue1 = uniformvalue(re.sub(' ', '', value[2].split('-')[0]))
+                    tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue1]
+                    exlist.append(tmplist)
+                    revalue2 = uniformvalue(re.sub(' ', '', value[2].split('-')[1]))
+                    tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue2]
+                    exlist.append(tmplist)
+                    continue
             else:
                 revalue = uniformvalue(value[2])
-        except ValueError:
-            #print("warning:{0}, this is not value:{1}".format("ValueError", value[2]))
+                tmplist = [value[0], value[1], value[2], 'value', 'no unit', False, revalue]
+                exlist.append(tmplist)
+        
+        except Exception as e:
+            print("warning:{0}\nthis is not value:{1}".format(e, value[2]))
             continue
-        except ZeroDivisionError:
-            #print("warning:{0}, this is not value:{1}".format("ZeroDivisionError", value[2]))
-            continue
-        except OverflowError:
-            #print("warning:{0}, this is not value:{1}".format("OverflowError", value[2]))
-            continue
-
-        if flag == 1:
-            tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
-        else:
-            tmplist = [value[0], value[1], value[2], 'value', 'no unit', False, revalue]
-        exlist.append(tmplist)
 
     return exlist
 
