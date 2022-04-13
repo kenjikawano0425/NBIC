@@ -365,11 +365,10 @@ def uniformvalue(value):
             revalue = eval(re.sub(' ', '', value))
     
     #solve MongoDB can only handle up to 8-byte ints
-    if revalue >= 2e63-1:
-        revalue = 2e63-1
-    elif revalue <=-2e63+1:
-        revalue = -2e63+1
-
+    if revalue >= 2 ** 63 - 1 :
+        revalue = 2 ** 62
+    elif revalue <=-(2 ** 63 - 1):
+        revalue = -(2 ** 62)
     return revalue
 
 
