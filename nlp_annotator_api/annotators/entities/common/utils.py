@@ -362,7 +362,7 @@ def uniformvalue(value):
             else:
                 revalue = float(tmplist[0]) * 10 ** float(re.sub('[\s\$\^\{\}\_]', '', tmplist[-1]))
         else:
-            revalue = eval(re.sub(' ', '', value))
+            revalue = float(re.sub(' ', '', value))
     
     #solve MongoDB can only handle up to 8-byte ints
     if revalue >= 2 ** 63 - 1 :
@@ -384,7 +384,7 @@ def revaluelist(valuelist):
                 revalue = value[2].split(" 6 ")[0]
                 tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
                 exlist.append(tmplist)
-            elif bool(re.search('and|to|&|,', value[2])):
+            elif bool(re.search('and|to|&|,|\/|\+', value[2])):
                 splitvalue = value[2]
                 regex = re.finditer(',', splitvalue)
                 offset = 0
@@ -394,7 +394,7 @@ def revaluelist(valuelist):
                         replace_tmp[reg.start()-offset] = ''
                         splitvalue = ''.join(replace_tmp)
                         offset = offset + 1
-                tmpvalues = re.split('and|to|&|,', splitvalue)
+                tmpvalues = re.split('and|to|&|,|\/|\+', splitvalue)
                 for i, tmpvalue in enumerate(tmpvalues):
                     if bool(re.search('\d', tmpvalue)):
                         if bool(re.search('((?<![Ee])(?<!10)(?<!\^)(?<!\{)(?<![Ee]\s)(?<!10\s)(?<!\^\s)(?<!\{\s))\-\s*(?=\d)', tmpvalue)):
