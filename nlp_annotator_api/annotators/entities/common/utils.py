@@ -350,7 +350,10 @@ def uniformvalue(value):
     if bool(re.search('(\*|X|x|×|GLYPH<[A-Z]+\d+>)', value)):
         if bool(re.search('(E|e|10)\s*((?=\-)|(?=\^)|(?=\+)|(?=\$))', value)):
             tmplist = re.split('(\*|X|x|×|GLYPH<[A-Z]+\d+>)', value)
-            revalue = float(re.sub('[\s\$\_\^\{\}]', '', tmplist[0])) * 10 ** int(re.sub('[\s\$\_\^\{\}]', '', re.split('E|E|e|10',tmplist[-1])[-1]))
+            tmpvalue = int(re.sub('[\s\$\_\^\{\}]', '', re.split('E|E|e|10',tmplist[-1])[-1]))
+            if tmpvalue > 300:
+                tmpvalue = 300
+            revalue = float(re.sub('[\s\$\_\^\{\}]', '', tmplist[0])) * 10 ** tmpvalue
         else:
             tmplist = re.split('(\*|X|x|×|GLYPH<[A-Z]+\d+>)', value)
             revalue = float(re.sub('[\s\$\_\^\{\}]', '', tmplist[0])) * float(re.sub('[\s\$\_\^\{\}]', '', tmplist[-1]))
@@ -360,9 +363,27 @@ def uniformvalue(value):
             if not bool(re.search('\d', tmplist[0])):
                 revalue = 10 ** int(re.sub('[\s\$\^\{\}\_]', '', tmplist[-1]))
             else:
-                revalue = float(tmplist[0]) * 10 ** float(re.sub('[\s\$\^\{\}\_]', '', tmplist[-1]))
+                tmpvalue = float(re.sub('[\s\$\^\{\}\_]', '', tmplist[-1]))
+                if tmpvalue > 300:
+                    tmpvalue = 300
+                revalue = float(tmplist[0]) * 10 ** tmpvalue
         else:
-            revalue = float(re.sub(' ', '', value))
+            if bool(re.search('E|E|e', value)):
+                tmplist = re.split('E|E|e', value)
+                if not tmplist[0] == '':
+                    revalue = float(re.sub(' ', '', tmplist[0])) * 10
+                elif not tmplist[1] == '':
+                    tmpvalue = float(re.sub(' ', '', tmplist[1]))
+                    if tmpvalue > 300:
+                        tmpvalue = 300
+                    revalue = 10 ** tmpvalue
+                else:
+                    tmpvalue = float(re.sub(' ', '', tmplist[1]))
+                    if tmpvalue > 300:
+                        tmpvalue = 300
+                    revalue = float(re.sub(' ', '', tmplist[0])) * 10 ** tmpvalue
+            else:
+                revalue = float(re.sub(' ', '', value))
     
     #solve MongoDB can only handle up to 8-byte ints
     if revalue >= 2 ** 63 - 1 :
@@ -378,13 +399,20 @@ def revaluelist(valuelist):
         if value[2][0] == ' ':
             value[0] = value[0]+1
             value[2] = value[2][1:len(value[2])]
-        
+        if len(re.findall('\.', value[2])) >= 2:
+            continue
+        if len(re.findall('\-', value[2])) >= 2:
+            continue
+        if len(value[2]) == 1:
+            if bool(re.search('[eE]', value[2])):
+                continue
+            
         try:
             if bool(re.search('(?<=\d)\s6\s(?=\d)', value[2])):
                 revalue = value[2].split(" 6 ")[0]
                 tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue]
                 exlist.append(tmplist)
-            elif bool(re.search('and|to|&|,|\/|\+', value[2])):
+            elif bool(re.search('and|to|&|,|\/', value[2])):
                 splitvalue = value[2]
                 regex = re.finditer(',', splitvalue)
                 offset = 0
@@ -394,17 +422,18 @@ def revaluelist(valuelist):
                         replace_tmp[reg.start()-offset] = ''
                         splitvalue = ''.join(replace_tmp)
                         offset = offset + 1
-                tmpvalues = re.split('and|to|&|,|\/|\+', splitvalue)
+                tmpvalues = re.split('and|to|&|,|\/', splitvalue)
                 for i, tmpvalue in enumerate(tmpvalues):
+                    tmpvalue = re.sub(' ', '', tmpvalue)
                     if bool(re.search('\d', tmpvalue)):
-                        if bool(re.search('((?<![Ee])(?<!10)(?<!\^)(?<!\{)(?<![Ee]\s)(?<!10\s)(?<!\^\s)(?<!\{\s))\-\s*(?=\d)', tmpvalue)):
-                            if tmpvalue[0] == "-":
+                        if bool(re.search('((?<![Ee])(?<!10)(?<!\^)(?<!\{)(?<![Ee]\s)(?<!10\s)(?<!\^\s)(?<!\{\s))[\-\+]\s*(?=\d)', tmpvalue)):
+                            if bool(re.search('[\-\+]', tmpvalue[0])):
                                 revalue = uniformvalue(tmpvalue)
                             else:
-                                revalue1 = uniformvalue(re.sub(' ', '', tmpvalue.split('-')[0]))
+                                revalue1 = uniformvalue(re.sub(' ', '', re.split('[\-\+]', tmpvalue)[0]))
                                 tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue1]
                                 exlist.append(tmplist)
-                                revalue2 = uniformvalue(re.sub(' ', '', tmpvalue.split('-')[1]))
+                                revalue2 = uniformvalue(re.sub(' ', '', re.split('[\-\+]', tmpvalue)[1]))
                                 tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue2]
                                 exlist.append(tmplist)
                                 continue
@@ -414,15 +443,15 @@ def revaluelist(valuelist):
                         exlist.append(tmplist)
                         continue
 
-            elif bool(re.search('((?<![Ee])(?<!10)(?<!\^)(?<!\{)(?<![Ee]\s)(?<!10\s)(?<!\^\s)(?<!\{\s))\-\s*(?=\d)', value[2])):
-                if value[2][0] == "-":
+            elif bool(re.search('((?<![Ee])(?<!10)(?<!\^)(?<!\{)(?<![Ee]\s)(?<!10\s)(?<!\^\s)(?<!\{\s))[\-\+]\s*(?=\d)', value[2])):
+                if bool(re.search('[\-\+]', re.sub(' ', '', value[2][0]))):
                     revalue = uniformvalue(value[2])
                     tmplist = [value[0], value[1], value[2], 'value', 'no unit', False, revalue]
                 else:
-                    revalue1 = uniformvalue(re.sub(' ', '', value[2].split('-')[0]))
+                    revalue1 = uniformvalue(re.sub(' ', '', re.split('[\-\+]', value[2])[0]))
                     tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue1]
                     exlist.append(tmplist)
-                    revalue2 = uniformvalue(re.sub(' ', '', value[2].split('-')[1]))
+                    revalue2 = uniformvalue(re.sub(' ', '', re.split('[\-\+]', value[2])[1]))
                     tmplist = [value[0], value[1], value[2], 'value', 'no unit', True, revalue2]
                     exlist.append(tmplist)
                     continue
