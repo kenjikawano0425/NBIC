@@ -399,8 +399,6 @@ def revaluelist(valuelist):
         if value[2][0] == ' ':
             value[0] = value[0]+1
             value[2] = value[2][1:len(value[2])]
-        if len(re.findall('\.', value[2])) >= 2:
-            continue
         if len(re.findall('\-', value[2])) >= 2:
             continue
         if len(value[2]) == 1:
@@ -418,10 +416,11 @@ def revaluelist(valuelist):
                 offset = 0
                 for reg in regex:
                     if not splitvalue[reg.start()-offset+1]==' ':
-                        replace_tmp = list(splitvalue)
-                        replace_tmp[reg.start()-offset] = ''
-                        splitvalue = ''.join(replace_tmp)
-                        offset = offset + 1
+                        if bool(re.search('(?<=\,)\d{3}', splitvalue[reg.start()-offset:reg.start()-offset+4])):
+                            replace_tmp = list(splitvalue)
+                            replace_tmp[reg.start()-offset] = ''
+                            splitvalue = ''.join(replace_tmp)
+                            offset = offset + 1
                 tmpvalues = re.split('and|to|&|,|\/', splitvalue)
                 for i, tmpvalue in enumerate(tmpvalues):
                     tmpvalue = re.sub(' ', '', tmpvalue)
