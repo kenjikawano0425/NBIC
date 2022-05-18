@@ -18,5 +18,15 @@
   {"_synonyms": ["Energy Barrier", "ENERGY BARRIER"], "_name": "energy barrier"},
   {"_synonyms": ["Light-off Temperature", "light off temperature"], "_name": "light-off temperature"},
   {"_synonyms": ["Density", "DENSITY"], "_name": "density"},
-  {"_synonyms": ["Band Gap", "BAND GAP", "BG", "band gaps"], "_name": "band gap"}
+  {"_synonyms": ["humidity"], "_name": "humidity"},
+  {"_synonyms": ["pressure"], "_name": "absolute pressure"},
+  {"_synonyms": ["efficiency"], "_name": "amine efficiency"},
+  {"_synonyms": ["N content"], "_name": "N content"},
+  {"_synonyms": ["adsorption"], "_name": "heat of adsorption"},
+  {"_synonyms": ["adsorption capacity"], "_name": "adsorption capacity"},
+  {"_synonyms": ["desorption rate"], "_name": "desorption rate"},
+  {"_synonyms": ["desorption capacity"], "_name": "desorption capacity"},
+  {"_synonyms": ["pore volume"], "_name": "pore volume"},
+  {"_synonyms": ["pore size"], "_name": "pore size"},
+  {"_synonyms": ["viscosity"], "_name": "viscosity"}
 ]
