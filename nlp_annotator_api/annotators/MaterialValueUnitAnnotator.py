@@ -14,6 +14,7 @@ from typing import List, Optional
 from .entities.MaterialAnnotator import MaterialAnnotator
 from .entities.ValueUnitAnnotator import ValueUnitAnnotator
 from .entities.ValueAnnotator import ValueAnnotator
+from .entities.UnitAnnotator import UnitAnnotator
 from .entities.PropertiesAnnotator import PropertiesAnnotator
 from .entities.ChemDataExtractor import ChemDataExtractor
 
@@ -32,10 +33,11 @@ class MaterialValueUnitAnnotator:
 
     _ent_annotator_classes = [
         MaterialAnnotator,
-        ValueUnitAnnotator,
+        ChemDataExtractor,
         ValueAnnotator,
-        PropertiesAnnotator,
-        ChemDataExtractor
+        UnitAnnotator,
+        ValueUnitAnnotator,
+        PropertiesAnnotator
         ]
 
     _rel_annotator_classes = [

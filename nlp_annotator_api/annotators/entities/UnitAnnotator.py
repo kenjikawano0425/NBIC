@@ -1,19 +1,20 @@
-from .common.utils import RegPropertiesAnnotator
+from .common.utils import RegUnitAnnotator
 
-class PropertiesAnnotator:
+class UnitAnnotator:
     
     def key(self) -> str:
-        return "properties"
+        return "units"
 
     def description(self) -> str:
-        return "Names of properties"
+        return "finding unit."
 
     def __init__(self):
 
         # init CDE
-        self.parser = RegPropertiesAnnotator
+        self.parser = RegUnitAnnotator
 
     def annotate_entities_text(self, text:str):
+
 
         ents=[]
 
@@ -22,19 +23,15 @@ class PropertiesAnnotator:
 
         for cem in doc:
 
-            name = cem[4]
-
+            name = cem[2]
             t0 = cem[0]
             t1 = cem[1]
-
-            typename = cem[3]
-
 
             ent = {
                 "match": name,
                 "range": [t0,t1],
                 "original": text[t0:t1],
-                "type": typename
+                "type":"units",
             }
             ents.append(ent)
 

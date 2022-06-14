@@ -12,6 +12,7 @@ resources_dir = os.path.abspath(
     )
 )
 
+
 def RegPropertiesAnnotator(paragraph):
 
     exlist = []
@@ -20,35 +21,49 @@ def RegPropertiesAnnotator(paragraph):
     json_load = json.load(json_open)
 
     for jsondata in json_load:
+        wordlist = []
         jsondata['_synonyms'].append(jsondata['_name'])
-
-        jsondata['_synonyms'].append(jsondata['_name'].capitalize())
-        jsondata['_synonyms'].append(jsondata['_name'].upper())
-        jsondata['_synonyms'].append(jsondata['_name'].lower())
-        jsondata['_synonyms'].append(jsondata['_name'].title())
-
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].capitalize()))
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].upper()))
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].lower()))
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name'].title()))
-
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).capitalize())
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).upper())
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).lower())
-        jsondata['_synonyms'].append(Inflector().pluralize(jsondata['_name']).title())
-
-        jsondata['_synonyms'] = sorted(list(set(jsondata['_synonyms'])), key=len, reverse=True)
-
-        pro_pattern = '|'.join(jsondata['_synonyms'])
-        pattern_re = re.compile(pro_pattern)
-        parser = pattern_re
+        words = jsondata['_synonyms']
+        for word in words:
+            wordlist.extend(Pattern_generation(word))
+        pro_pattern = '|'.join(wordlist)
+        parser = re.compile(pro_pattern)
         regex = parser.finditer(paragraph)
         for reg in regex:
             if not reg.group() == '':
-                exlist.append([reg.start(), reg.end(), reg.group(), "properties"])
-                exlist.append([reg.start(), reg.end(), reg.group(), jsondata['_name']])
-        
+                exlist.append([reg.start(), reg.end(), reg.group(), "properties", jsondata['_name']])
+    exlist = sorted(exlist)
     return exlist
+
+def Pattern_generation(word):
+    word = Inflector().singularize(word)
+    wordlist = []
+    wordlist.append(word.capitalize())
+    wordlist.append(word.upper())
+    wordlist.append(word.lower())
+    wordlist.append(word.title())
+    wordlist.append(Inflector().titleize(word))
+    wordlist.append(Inflector().titleize(word, 'first'))
+
+    wordlist.append(Inflector().pluralize(word.capitalize()))
+    wordlist.append(Inflector().pluralize(word.upper()))
+    wordlist.append(Inflector().pluralize(word.lower()))
+    wordlist.append(Inflector().pluralize(word.title()))
+    wordlist.append(Inflector().pluralize(Inflector().titleize(word)))
+    wordlist.append(Inflector().pluralize(Inflector().titleize(word, 'first')))
+
+    wordlist.append(Inflector().pluralize(word).capitalize())
+    wordlist.append(Inflector().pluralize(word).upper())
+    wordlist.append(Inflector().pluralize(word).lower())
+    wordlist.append(Inflector().pluralize(word).title())
+    wordlist.append(Inflector().titleize(Inflector().pluralize(word)))
+    wordlist.append(Inflector().titleize(Inflector().pluralize(word), 'first'))
+
+    wordlist = list(set(wordlist))
+    return wordlist
+
+
+
 
 
 def RegValueAnnotator(paragraph):
@@ -474,3 +489,16 @@ def ChemDataAnnotator(paragraph):
         exlist.append([text.start, text.end, text.text])
 
     return exlist
+
+def RegUnitAnnotator(paragraph):
+    unit_pattern = '(?<=[\d\$\/\(\s\[])\s?((f|p|n|(u|μ)|m|c|d|k|M|G|P)?(p\s*e\s*r\s*c\s*e\s*n\s*t\s*a\s*g\s*e|w\s*e\s*i\s*g\s*h\s*t|v\s*o\s*l\s*u\s*m\s*e|a\s*t\s*o\s*m|h\s*o\s*u\s*r|vol.%|m\s*i\s*n|s\s*e\s*c|v\s*o\s*l|p\s*p\s*m|m\s*o\s*l|c\s*a\s*t|(o\s*h\s*m|Ω)|w\s*t|P\s*a|e\s*V|h|H|s|C|K|T|m|l|L|J|g|Å|θ|%|°|℃|V|A)+([−\^\/\_\-\+\d\s\$\{\}])*)+((?=to)|(?![a-z]))'
+    pattern_re = re.compile(unit_pattern)
+    parser = pattern_re
+    regex = parser.finditer(paragraph)
+    exlist = []
+    for reg in regex:
+        if not reg.group() == '':
+            exlist.append([reg.start(), reg.end(), reg.group(), 'unit'])
+
+    exlist = list(map(list, set(map(tuple, exlist))))
+    return sorted(exlist)
