@@ -32,16 +32,16 @@ class MaterialValueUnitAnnotator:
         }
 
     _ent_annotator_classes = [
-        #MaterialAnnotator,
+        MaterialAnnotator,
         ChemDataExtractor,
         ValueAnnotator,
-        #UnitAnnotator,
-        ValueUnitAnnotator
-        #PropertiesAnnotator
+        UnitAnnotator,
+        ValueUnitAnnotator,
+        PropertiesAnnotator
         ]
 
     _rel_annotator_classes = [
-        #MaterialtoValueUnittoPropertiesAnnotator
+        MaterialtoValueUnittoPropertiesAnnotator
     ]
 
     def __init__(self):
